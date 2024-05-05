@@ -44,6 +44,7 @@ function GameController(
     playerTwoName = "Player 2"
 ){
     const size = 3;
+    let round = 1;
     const board = Gameboard();
     const players = [
         {
@@ -85,6 +86,7 @@ function GameController(
         }
         if (row === column) {
             //diag check
+            //(0,0),(1,1),(2,2)
             for(let i = 0; i < size; i++) {
                 if(board.getCell(i,i).getValue()!==currentPlayer.token) {
                     break
@@ -96,6 +98,8 @@ function GameController(
 
         }
         if (row+column == size-1) {
+            //Check other diag
+            //(2,0),(1,1),(0,2)
             for (let i = 0; i < size; i++) {
                 if(board.getCell(i,(size-1)-1) !== currentPlayer.token) {
                     break;
@@ -108,9 +112,13 @@ function GameController(
         return false;
     }
     const playRound = (row,column) => {
+        if (round > size*size) {
+            console.log("The game is a tie");
+        }
         //invalid move handling?
         if (board.getCell(row,column).getValue() === "") {
             board.placePiece(row,column,currentPlayer.token);
+            round++;
             checkWinner(row,column) ? 
             console.log(`${currentPlayer.name} wins!`) :
             switchPlayer();
@@ -127,3 +135,20 @@ function GameController(
     };
 }
 const game = GameController();
+
+//
+game.playRound(0,1);
+//
+game.playRound(0,0);
+//
+game.playRound(1,1);
+game.playRound(1,0);
+//
+game.playRound(2,0);
+game.playRound(2,1);
+//
+game.playRound(2,2);
+game.playRound(0,2);
+//
+game.playRound(1,2);
+game.playRound(0,0);
