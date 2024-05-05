@@ -17,12 +17,24 @@ function Gameboard() {
     const placePiece = (row,column,player) => {
         board[row][column].setPiece(player)
     };
-
+    const clearBoard = () => {
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                board[i][j].setPiece("");
+            }
+        }
+    }
     const printBoard = () => {
         const boardToPrint = board.map((row) => row.map((cell) => cell.getValue()));
         console.log(boardToPrint);
     };
-    return {printBoard, getBoard, placePiece, getCell};
+    return {
+        printBoard, 
+        getBoard, 
+        placePiece, 
+        getCell,
+        clearBoard
+    };
 }
 
 function Cell() {
@@ -44,9 +56,11 @@ function GameController(
     playerTwoName = "Player 2"
 ){
     let gameActive = true;
+
     const size = 3;
     let round = 1;
     const board = Gameboard();
+
     const players = [
         {
             name: playerOneName,
@@ -71,6 +85,7 @@ function GameController(
     const printRound = () => {
         board.printBoard();
     }
+    const getGameState = () => gameActive;
 
     const checkWinner = (row,column) => {
         //check column
@@ -126,7 +141,7 @@ function GameController(
     const playRound = (row,column) => {
         
         //invalid move handling?
-        if (board.getCell(row,column).getValue() === "" && gameActive) {
+        if (board.getCell(row,column).getValue() === "") {
             board.placePiece(row,column,currentPlayer.token);
             round++;
             //handle wins
@@ -155,11 +170,17 @@ function GameController(
         }
     }
     //printRound();
-
+    const nextGame = () => {
+        round = 1;
+        board.clearBoard();
+        gameActive = true;
+    }
     return {
         playRound,
         getCurrentPlayer,
-        getBoard: board.getBoard
+        getBoard: board.getBoard,
+        getGameState,
+        nextGame
     };
 }
 
@@ -167,14 +188,18 @@ function ScreenController() {
     const game = GameController();
     const boardDiv = document.querySelector('.board');
     const turnDiv = document.querySelector('.turn');
-
+    const modal = document.querySelector('.modal');
+    const winner = document.querySelector('.winner');
+    const newGameBtn = document.querySelector('#restart');
     const updateScreen = () => {
         boardDiv.textContent = "";
 
         const board = game.getBoard();
         const currentPlayer = game.getCurrentPlayer();
+        const gameActive = game.getGameState();
 
         turnDiv.textContent = `${currentPlayer.name}'s turn`;
+        //inefficient, recreates entire gameboard every turn
         board.forEach((row,rowIndex) => {
             row.forEach((cell,colIndex) => {
                     //console.log(`row ${rowIndex}`,`column ${colIndex}`);
@@ -186,15 +211,28 @@ function ScreenController() {
                     boardDiv.appendChild(cellBtn);
             })
         });
+        if (!gameActive) {
+            console.log("game is over chump");
+            modal.style.display = "block";
+            winner.textContent = `${currentPlayer.name} wins`;
+        }
+    }
+    const reset = () => {
+        console.log("game restarting");
+        game.nextGame();
+        updateScreen();
+        modal.style.display = "none";
     }
     function clickHandler(e) {
         game.playRound(e.target.dataset.row,e.target.dataset.column);
         updateScreen();
     }
+    newGameBtn.addEventListener("click",reset);
+    //handle end game
     boardDiv.addEventListener("click",clickHandler);
     updateScreen();
 }
-const screen = ScreenController();
+ScreenController();
 /*
 //
 game.playRound(0,1);
