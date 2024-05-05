@@ -66,6 +66,7 @@ function GameController(
     const printRound = () => {
         board.printBoard();
     }
+
     const checkWinner = (row,column) => {
         //check column
         for (let i = 0; i < size; i++) {
@@ -111,6 +112,7 @@ function GameController(
         }
         return false;
     }
+
     const playRound = (row,column) => {
         if (round > size*size) {
             console.log("The game is a tie");
@@ -131,11 +133,37 @@ function GameController(
 
     return {
         playRound,
-        getCurrentPlayer
+        getCurrentPlayer,
+        getBoard: board.getBoard
     };
 }
-const game = GameController();
 
+function ScreenController() {
+    const game = GameController();
+    const boardDiv = document.querySelector('.board');
+    const turnDiv = document.querySelector('.turn');
+
+    const updateScreen = () => {
+        boardDiv.textContent = "";
+
+        const board = game.getBoard();
+        const currentPlayer = game.getCurrentPlayer();
+
+        turnDiv.textContent = `${currentPlayer.name}'s turn`;
+
+        board.forEach(row => {
+            row.forEach((cell,index) => {
+                    const cellBtn = document.createElement("button");
+                    cellBtn.classList.add("cell");
+                    cellBtn.textContent = cell.getValue();
+                    boardDiv.appendChild(cellBtn);
+            })
+        });
+    }
+    updateScreen();
+}
+const screen = ScreenController();
+/*
 //
 game.playRound(0,1);
 //
@@ -151,4 +179,4 @@ game.playRound(2,2);
 game.playRound(0,2);
 //
 game.playRound(1,2);
-game.playRound(0,0);
+game.playRound(0,0);*/
