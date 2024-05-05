@@ -25,7 +25,7 @@ function Gameboard() {
     }
     const printBoard = () => {
         const boardToPrint = board.map((row) => row.map((cell) => cell.getValue()));
-        console.log(boardToPrint);
+        //console.log(boardToPrint);
     };
     return {
         printBoard, 
@@ -79,16 +79,17 @@ function GameController(
         currentPlayer = currentPlayer === players[0] ? players[1]:players[0];
     };
     const getCurrentPlayer = () => currentPlayer;
-
+    const getPlayer = (index) => players[index];
     const printRound = () => {
         board.printBoard();
     }
     const getGameState = () => gameActive;
+
     const getWinMsg = () => winMsg;
 
     const checkWinner = (row,column) => {
         //check column
-        console.log(`Row: ${row}, Column: ${column}`)
+        //console.log(`Row: ${row}, Column: ${column}`)
         for (let i = 0; i < size; i++) {
             if (board.getCell(row,i).getValue() !== currentPlayer.token) {
                 break;
@@ -121,7 +122,7 @@ function GameController(
         }
         
         if (parseInt(row) + parseInt(column) === (size-1)) {
-            console.log(row,column);
+            //console.log(row,column);
             //Check other diag
             //(2,0),(1,1),(0,2)
             for (let i = 0; i < size; i++) {
@@ -152,19 +153,19 @@ function GameController(
                 switchPlayer();
             }
         }
-        //printRound(); 
         //handle draws
-        if (round > size*size) {
+        if (round > size*size && gameActive) {
             endGame();
         }
     }
 
     const endGame =  (player) => {
+        //console.log(player);
         gameActive = false;
         if (player) {
             player.score++;
             winMsg = `${player.name} Wins`;
-            //console.log(`${player.name} wins`);
+            console.log(`${player.name} wins`);
         } else {
             winMsg = "Game is a draw";
             //console.log("draw");
@@ -174,12 +175,14 @@ function GameController(
     const nextGame = () => {
         round = 1;
         winMsg = "";
+        currentPlayer = players[0];
         board.clearBoard();
         gameActive = true;
     }
     return {
         playRound,
         getCurrentPlayer,
+        getPlayer,
         getBoard: board.getBoard,
         getGameState,
         getWinMsg,
@@ -188,11 +191,14 @@ function GameController(
 }
 
 function ScreenController() {
-    let game = GameController();
+    let game = GameController("Jerry","Terry");
+
     const boardDiv = document.querySelector('.board');
     const turnDiv = document.querySelector('.turn');
     const modal = document.querySelector('.modal');
-    const winner = document.querySelector('.winner');
+    const winnerDiv = document.querySelector('.winner');
+    const scoreDiv = document.querySelector('.score');
+
     const newGameBtn = document.querySelector('#restart');
     const clearBtn = document.querySelector('#clear');
 
@@ -204,6 +210,7 @@ function ScreenController() {
         const gameActive = game.getGameState();
 
         turnDiv.textContent = `${currentPlayer.name}'s turn`;
+        scoreDiv.textContent = `${game.getPlayer(0).score} - ${game.getPlayer(1).score}`;
         //inefficient, recreates entire gameboard every turn
         board.forEach((row,rowIndex) => {
             row.forEach((cell,colIndex) => {
@@ -217,9 +224,9 @@ function ScreenController() {
             })
         });
         if (!gameActive) {
-            console.log("game is over chump");
+            //console.log("game is over chump");
             modal.style.display = "block";
-            winner.textContent = game.getWinMsg();
+            winnerDiv.textContent = game.getWinMsg();
         }
     }
     const newGame = () => {
@@ -228,14 +235,17 @@ function ScreenController() {
         updateScreen();
         modal.style.display = "none";
     }
+
     const clearGame = () => {
         game = GameController();
         updateScreen();
     }
+
     function clickHandler(e) {
         game.playRound(e.target.dataset.row,e.target.dataset.column);
         updateScreen();
     }
+
     newGameBtn.addEventListener("click",newGame);
     clearBtn.addEventListener("click",clearGame);
     //handle end game
