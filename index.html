@@ -9,18 +9,24 @@
 <body>
     <div class="container">
         <h2 class="turn"></h2>
+        <div class="score"></div>
         <button id="clear">CLEAR</button>
         <div class="board"></div>
     </div>
     <div id ="game-over" class="modal">
-
-        <!-- Modal content -->
         <div class="modal-content">
             <div class="winner"></div>
             <button id="restart">Go AGAIN</button>
         </div>
-      
-      </div>
+    </div>
+    <div id="pre-game" class="modal">
+        <div class="modal-content">
+            <label for="player1">Player 1's Name:</label>
+            <input type="text" id="player1">
+            <label for="player2">Player 2's Name;</label>
+            <input type="text" id="player2">
+        </div>
+    </div>
       
     <script src="noughts_and_crosses.js"></script>
 </body>
