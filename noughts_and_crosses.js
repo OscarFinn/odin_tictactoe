@@ -1,5 +1,4 @@
-//gameboard object
-//player object
+
 function Gameboard() {
     const board = [];
     const size = 3;
@@ -60,6 +59,7 @@ function GameController(
     const size = 3;
     let round = 1;
     const board = Gameboard();
+    let winMsg = "";
 
     const players = [
         {
@@ -74,9 +74,7 @@ function GameController(
         }
     ];
     let currentPlayer = players[0];
-    players.forEach(player => {
-        console.log(player.name);
-    })
+
     const switchPlayer = () => {
         currentPlayer = currentPlayer === players[0] ? players[1]:players[0];
     };
@@ -86,6 +84,7 @@ function GameController(
         board.printBoard();
     }
     const getGameState = () => gameActive;
+    const getWinMsg = () => winMsg;
 
     const checkWinner = (row,column) => {
         //check column
@@ -164,14 +163,17 @@ function GameController(
         gameActive = false;
         if (player) {
             player.score++;
-            console.log(`${player.name} wins`);
+            winMsg = `${player.name} Wins`;
+            //console.log(`${player.name} wins`);
         } else {
-            console.log("draw");
+            winMsg = "Game is a draw";
+            //console.log("draw");
         }
     }
     //printRound();
     const nextGame = () => {
         round = 1;
+        winMsg = "";
         board.clearBoard();
         gameActive = true;
     }
@@ -180,17 +182,20 @@ function GameController(
         getCurrentPlayer,
         getBoard: board.getBoard,
         getGameState,
+        getWinMsg,
         nextGame
     };
 }
 
 function ScreenController() {
-    const game = GameController();
+    let game = GameController();
     const boardDiv = document.querySelector('.board');
     const turnDiv = document.querySelector('.turn');
     const modal = document.querySelector('.modal');
     const winner = document.querySelector('.winner');
     const newGameBtn = document.querySelector('#restart');
+    const clearBtn = document.querySelector('#clear');
+
     const updateScreen = () => {
         boardDiv.textContent = "";
 
@@ -214,39 +219,27 @@ function ScreenController() {
         if (!gameActive) {
             console.log("game is over chump");
             modal.style.display = "block";
-            winner.textContent = `${currentPlayer.name} wins`;
+            winner.textContent = game.getWinMsg();
         }
     }
-    const reset = () => {
-        console.log("game restarting");
+    const newGame = () => {
+        //console.log("game restarting");
         game.nextGame();
         updateScreen();
         modal.style.display = "none";
+    }
+    const clearGame = () => {
+        game = GameController();
+        updateScreen();
     }
     function clickHandler(e) {
         game.playRound(e.target.dataset.row,e.target.dataset.column);
         updateScreen();
     }
-    newGameBtn.addEventListener("click",reset);
+    newGameBtn.addEventListener("click",newGame);
+    clearBtn.addEventListener("click",clearGame);
     //handle end game
     boardDiv.addEventListener("click",clickHandler);
     updateScreen();
 }
 ScreenController();
-/*
-//
-game.playRound(0,1);
-//
-game.playRound(0,0);
-//
-game.playRound(1,1);
-game.playRound(1,0);
-//
-game.playRound(2,0);
-game.playRound(2,1);
-//
-game.playRound(2,2);
-game.playRound(0,2);
-//
-game.playRound(1,2);
-game.playRound(0,0);*/
