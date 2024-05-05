@@ -60,7 +60,9 @@ function GameController(
         }
     ];
     let currentPlayer = players[0];
-
+    players.forEach(player => {
+        console.log(player.name);
+    })
     const switchPlayer = () => {
         currentPlayer = currentPlayer === players[0] ? players[1]:players[0];
     };
@@ -129,14 +131,12 @@ function GameController(
             round++;
             //handle wins
             if (checkWinner(row,column)) {
-                endGame(currentPlayer.name);
+                endGame(currentPlayer);
                 //console.log(`${currentPlayer.name} wins!`)
             } else {
                 //continue game
                 switchPlayer();
             }
-        } else {
-            console.log("invalid move, try again")
         }
         //printRound(); 
         //handle draws
