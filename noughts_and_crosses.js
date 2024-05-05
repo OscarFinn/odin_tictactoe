@@ -43,17 +43,20 @@ function GameController(
     playerOneName = "Player 1",
     playerTwoName = "Player 2"
 ){
+    let gameActive = true;
     const size = 3;
     let round = 1;
     const board = Gameboard();
     const players = [
         {
             name: playerOneName,
-            token: "X"
+            token: "X",
+            score: 0
         },
         {
             name: playerTwoName,
-            token: "O"
+            token: "O",
+            score: 0
         }
     ];
     let currentPlayer = players[0];
@@ -94,7 +97,7 @@ function GameController(
                     break;
                 }
                 if (i==size-1){
-                    console.log("diag win")
+                    //console.log("diag win")
                     return true;
                 }
             }
@@ -110,7 +113,7 @@ function GameController(
                     break;
                 }
                 if (i==size-1){
-                    console.log("reached");
+                    //console.log("reached");
                     return true;
                 }
             }
@@ -119,20 +122,37 @@ function GameController(
     }
 
     const playRound = (row,column) => {
-        if (round > size*size) {
-            console.log("The game is a tie");
-        }
+        
         //invalid move handling?
-        if (board.getCell(row,column).getValue() === "") {
+        if (board.getCell(row,column).getValue() === "" && gameActive) {
             board.placePiece(row,column,currentPlayer.token);
             round++;
-            checkWinner(row,column) ? 
-            console.log(`${currentPlayer.name} wins!`) :
-            switchPlayer();
+            //handle wins
+            if (checkWinner(row,column)) {
+                endGame(currentPlayer.name);
+                //console.log(`${currentPlayer.name} wins!`)
+            } else {
+                //continue game
+                switchPlayer();
+            }
         } else {
             console.log("invalid move, try again")
         }
         //printRound(); 
+        //handle draws
+        if (round > size*size) {
+            endGame();
+        }
+    }
+
+    const endGame =  (player) => {
+        gameActive = false;
+        if (player) {
+            player.score++;
+            console.log(`${player.name} wins`);
+        } else {
+            console.log("draw");
+        }
     }
     //printRound();
 
