@@ -79,7 +79,18 @@ function GameController(
         currentPlayer = currentPlayer === players[0] ? players[1]:players[0];
     };
     const getCurrentPlayer = () => currentPlayer;
+
     const getPlayer = (index) => players[index];
+
+    const setPlayerName = (index,name) => {
+        players[index].name = name;
+    }
+    const swapTokens = () => {
+        const token1 = players[0].token;
+        const token2 = players[1].token;
+        players[0].token = token2;
+        players[1].token = token1;
+    }
     const printRound = () => {
         board.printBoard();
     }
@@ -175,7 +186,9 @@ function GameController(
     const nextGame = () => {
         round = 1;
         winMsg = "";
-        currentPlayer = players[0];
+        //token swap
+        swapTokens();
+        if (currentPlayer.token !== 'X') switchPlayer();
         board.clearBoard();
         gameActive = true;
     }
@@ -183,6 +196,7 @@ function GameController(
         playRound,
         getCurrentPlayer,
         getPlayer,
+        setPlayerName,
         getBoard: board.getBoard,
         getGameState,
         getWinMsg,
@@ -191,17 +205,37 @@ function GameController(
 }
 
 function ScreenController() {
-    let game = GameController("Jerry","Terry");
-
     const boardDiv = document.querySelector('.board');
     const turnDiv = document.querySelector('.turn');
-    const modal = document.querySelector('.modal');
+    const gameOverModal = document.querySelector('#game-over');
+    const preGameModal = document.querySelector('#pre-game')
     const winnerDiv = document.querySelector('.winner');
     const scoreDiv = document.querySelector('.score');
 
     const newGameBtn = document.querySelector('#restart');
     const clearBtn = document.querySelector('#clear');
+    const startBtn = document.querySelector('#start-game');
 
+    let game = GameController();
+
+    const preGame = () => {
+        preGameModal.style.display = "block";
+    }
+    const startGame = () => {
+        console.log("starting game")
+        const p1Name = document.getElementById('player1-name').value;
+        const p2Name = document.getElementById('player2-name').value;
+
+        if(p1Name !== "") {
+            console.log("reaching");
+            game.setPlayerName(0,p1Name);
+        }
+        if(p2Name != "") {
+            game.setPlayerName(1,p2Name);
+        }
+        preGameModal.style.display = "none";
+        updateScreen();
+    }
     const updateScreen = () => {
         boardDiv.textContent = "";
 
@@ -225,7 +259,7 @@ function ScreenController() {
         });
         if (!gameActive) {
             //console.log("game is over chump");
-            modal.style.display = "block";
+            gameOverModal.style.display = "block";
             winnerDiv.textContent = game.getWinMsg();
         }
     }
@@ -233,7 +267,7 @@ function ScreenController() {
         //console.log("game restarting");
         game.nextGame();
         updateScreen();
-        modal.style.display = "none";
+        gameOverModal.style.display = "none";
     }
 
     const clearGame = () => {
@@ -245,11 +279,11 @@ function ScreenController() {
         game.playRound(e.target.dataset.row,e.target.dataset.column);
         updateScreen();
     }
-
+    startBtn.addEventListener("click", startGame);
     newGameBtn.addEventListener("click",newGame);
     clearBtn.addEventListener("click",clearGame);
     //handle end game
     boardDiv.addEventListener("click",clickHandler);
-    updateScreen();
+    preGame();
 }
 ScreenController();
