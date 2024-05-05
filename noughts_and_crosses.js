@@ -150,16 +150,23 @@ function ScreenController() {
         const currentPlayer = game.getCurrentPlayer();
 
         turnDiv.textContent = `${currentPlayer.name}'s turn`;
-
-        board.forEach(row => {
-            row.forEach((cell,index) => {
+        board.forEach((row,rowIndex) => {
+            row.forEach((cell,colIndex) => {
+                    console.log(`row ${rowIndex}`,`column ${colIndex}`);
                     const cellBtn = document.createElement("button");
                     cellBtn.classList.add("cell");
+                    cellBtn.dataset.row = rowIndex;
+                    cellBtn.dataset.column = colIndex;
                     cellBtn.textContent = cell.getValue();
                     boardDiv.appendChild(cellBtn);
             })
         });
     }
+    function clickHandler(e) {
+        game.playRound(e.target.dataset.row,e.target.dataset.column);
+        updateScreen();
+    }
+    boardDiv.addEventListener("click",clickHandler);
     updateScreen();
 }
 const screen = ScreenController();
