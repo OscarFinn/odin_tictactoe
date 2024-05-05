@@ -69,6 +69,7 @@ function GameController(
 
     const checkWinner = (row,column) => {
         //check column
+        console.log(`Row: ${row}, Column: ${column}`)
         for (let i = 0; i < size; i++) {
             if (board.getCell(row,i).getValue() !== currentPlayer.token) {
                 break;
@@ -90,22 +91,26 @@ function GameController(
             //(0,0),(1,1),(2,2)
             for(let i = 0; i < size; i++) {
                 if(board.getCell(i,i).getValue()!==currentPlayer.token) {
-                    break
+                    break;
                 }
                 if (i==size-1){
+                    console.log("diag win")
                     return true;
                 }
             }
 
         }
-        if (row+column == size-1) {
+        
+        if (parseInt(row) + parseInt(column) === (size-1)) {
+            console.log(row,column);
             //Check other diag
             //(2,0),(1,1),(0,2)
             for (let i = 0; i < size; i++) {
-                if(board.getCell(i,(size-1)-1) !== currentPlayer.token) {
+                if(board.getCell(i,(size-1)-i).getValue() !== currentPlayer.token) {
                     break;
                 }
                 if (i==size-1){
+                    console.log("reached");
                     return true;
                 }
             }
@@ -127,9 +132,9 @@ function GameController(
         } else {
             console.log("invalid move, try again")
         }
-        printRound(); 
+        //printRound(); 
     }
-    printRound();
+    //printRound();
 
     return {
         playRound,
@@ -152,7 +157,7 @@ function ScreenController() {
         turnDiv.textContent = `${currentPlayer.name}'s turn`;
         board.forEach((row,rowIndex) => {
             row.forEach((cell,colIndex) => {
-                    console.log(`row ${rowIndex}`,`column ${colIndex}`);
+                    //console.log(`row ${rowIndex}`,`column ${colIndex}`);
                     const cellBtn = document.createElement("button");
                     cellBtn.classList.add("cell");
                     cellBtn.dataset.row = rowIndex;
