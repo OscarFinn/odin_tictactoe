@@ -60,6 +60,7 @@ function GameController(
     let round = 1;
     const board = Gameboard();
     let winMsg = "";
+    let winningCells = [];
 
     const players = [
         {
@@ -94,6 +95,7 @@ function GameController(
     const printRound = () => {
         board.printBoard();
     }
+    const getWinningCells = () => winningCells;
     const getGameState = () => gameActive;
 
     const getWinMsg = () => winMsg;
@@ -103,7 +105,10 @@ function GameController(
         //console.log(`Row: ${row}, Column: ${column}`)
         for (let i = 0; i < size; i++) {
             if (board.getCell(row,i).getValue() !== currentPlayer.token) {
+                winningCells = [];
                 break;
+            } else {
+                winningCells.push(`${row}${i}`);
             }
             if (i==size-1){
                 return true;
@@ -111,8 +116,11 @@ function GameController(
         }
         for (let i = 0; i < size; i++) {
             if (board.getCell(i,column).getValue() !== currentPlayer.token) {
+                winningCells = [];
                 break;
-            } 
+            } else {
+                winningCells.push(`${i}${column}`);
+            }
             if (i==size-1){
                 return true;
             }
@@ -122,7 +130,10 @@ function GameController(
             //(0,0),(1,1),(2,2)
             for(let i = 0; i < size; i++) {
                 if(board.getCell(i,i).getValue()!==currentPlayer.token) {
+                    winningCells = [];
                     break;
+                } else {
+                    winningCells.push(`${i}${i}`);
                 }
                 if (i==size-1){
                     //console.log("diag win")
@@ -138,7 +149,10 @@ function GameController(
             //(2,0),(1,1),(0,2)
             for (let i = 0; i < size; i++) {
                 if(board.getCell(i,(size-1)-i).getValue() !== currentPlayer.token) {
+                    winningCells = [];
                     break;
+                } else {
+                    winningCells.push(`${i}${(size-1)-i}`);
                 }
                 if (i==size-1){
                     //console.log("reached");
@@ -157,6 +171,7 @@ function GameController(
             round++;
             //handle wins
             if (checkWinner(row,column)) {
+                console.log(getWinningCells());
                 endGame(currentPlayer);
                 //console.log(`${currentPlayer.name} wins!`)
             } else {
@@ -176,7 +191,7 @@ function GameController(
         if (player) {
             player.score++;
             winMsg = `${player.name} Wins`;
-            console.log(`${player.name} wins`);
+            //console.log(`${player.name} wins`);
         } else {
             winMsg = "Game is a draw";
             //console.log("draw");
@@ -186,6 +201,7 @@ function GameController(
     const nextGame = () => {
         round = 1;
         winMsg = "";
+        winningCells = [];
         //token swap
         swapTokens();
         if (currentPlayer.token !== 'X') switchPlayer();
@@ -200,6 +216,7 @@ function GameController(
         getBoard: board.getBoard,
         getGameState,
         getWinMsg,
+        getWinningCells,
         nextGame
     };
 }
@@ -275,7 +292,13 @@ function ScreenController() {
                     cellBtn.classList.add("cell");
                     cellBtn.dataset.row = rowIndex;
                     cellBtn.dataset.column = colIndex;
+                    if(game.getWinningCells().includes(`${rowIndex}${colIndex}`)){
+                        cellBtn.style.backgroundColor = "green";
+                    } else {
+                        cellBtn.style.backgroundColor = "white";
+                    }
                     cellBtn.textContent = cell.getValue();
+                    
                     boardDiv.appendChild(cellBtn);
             })
         });
@@ -294,7 +317,7 @@ function ScreenController() {
 
     const clearGame = () => {
         game = GameController();
-        updateScreen();
+        preGame();
     }
 
     function clickHandler(e) {
