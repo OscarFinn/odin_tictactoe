@@ -206,15 +206,19 @@ function GameController(
 
 function ScreenController() {
     const boardDiv = document.querySelector('.board');
-    const turnDiv = document.querySelector('.turn');
+    //const turnDiv = document.querySelector('.turn');
     const gameOverModal = document.querySelector('#game-over');
     const preGameModal = document.querySelector('#pre-game')
     const winnerDiv = document.querySelector('.winner');
     const scoreDiv = document.querySelector('.score');
 
+    const player1Div = document.getElementById("p1");
+    const player2Div = document.getElementById("p2");
+
     const newGameBtn = document.querySelector('#restart');
     const clearBtn = document.querySelector('#clear');
     const startBtn = document.querySelector('#start-game');
+
 
     let game = GameController();
 
@@ -243,9 +247,27 @@ function ScreenController() {
         const currentPlayer = game.getCurrentPlayer();
         const gameActive = game.getGameState();
 
-        turnDiv.textContent = `${currentPlayer.name}'s turn`;
-        scoreDiv.textContent = `${game.getPlayer(0).score} - ${game.getPlayer(1).score}`;
-        //inefficient, recreates entire gameboard every turn
+        const p1 = game.getPlayer(0);
+        const p2 = game.getPlayer(1);
+        //turnDiv.textContent = `${currentPlayer.name}'s turn`;
+        //scoreDiv.textContent = `${game.getPlayer(0).score} - ${game.getPlayer(1).score}`;
+        player1Div.children[0].textContent = `${p1.name}`
+        player2Div.children[0].textContent = `${p2.name}`;
+        
+        player1Div.children[1].textContent = `Token: ${p1.token}`
+        player2Div.children[1].textContent = `Token: ${p2.token}`
+
+        player1Div.children[2].textContent = `Score: ${p1.score}`
+        player2Div.children[2].textContent = `Score: ${p2.score}`
+
+        if (currentPlayer === p1) {
+            player1Div.style.backgroundColor = "green"
+            player2Div.style.backgroundColor = "white"
+        } else {
+            player2Div.style.backgroundColor = "green";
+            player1Div.style.backgroundColor = "white"
+        }
+        //inefficient? recreates entire gameboard every turn
         board.forEach((row,rowIndex) => {
             row.forEach((cell,colIndex) => {
                     //console.log(`row ${rowIndex}`,`column ${colIndex}`);
